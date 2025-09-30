@@ -30,7 +30,7 @@ Submitted: ${new Date().toLocaleString()}
     `.trim()
 
     // Send email using Resend
-    const data = await resend.emails.send({
+    await resend.emails.send({
       from: 'Bug Reports <onboarding@resend.dev>',
       to: '827070@bmtisd.com',
       subject: `Bug Report - Tic-Tac-Toe Game${name ? ` from ${name}` : ''}`,
@@ -39,7 +39,7 @@ Submitted: ${new Date().toLocaleString()}
     })
 
     return NextResponse.json(
-      { message: 'Bug report sent successfully', id: data.id },
+      { message: 'Bug report sent successfully' },
       { status: 200 }
     )
   } catch (error) {
