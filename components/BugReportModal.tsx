@@ -1,68 +1,12 @@
 'use client'
 
-import { useState } from 'react'
-
 interface BugReportModalProps {
   isOpen: boolean
   onClose: () => void
 }
 
 export default function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    description: ''
-  })
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
-  const [errorMessage, setErrorMessage] = useState('')
-
   if (!isOpen) return null
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    setSubmitStatus('idle')
-    setErrorMessage('')
-
-    try {
-      const response = await fetch('/api/bug-report', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to send bug report')
-      }
-
-      setSubmitStatus('success')
-      setFormData({ name: '', email: '', description: '' })
-      
-      // Auto close after success
-      setTimeout(() => {
-        onClose()
-        setSubmitStatus('idle')
-      }, 2000)
-    } catch (error) {
-      setSubmitStatus('error')
-      setErrorMessage(error instanceof Error ? error.message : 'Failed to send bug report')
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
-  const handleClose = () => {
-    if (!isSubmitting) {
-      onClose()
-      setSubmitStatus('idle')
-      setErrorMessage('')
-    }
-  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
@@ -70,12 +14,11 @@ export default function BugReportModal({ isOpen, onClose }: BugReportModalProps)
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Report Bug or Issue
+            Contact Me
           </h2>
           <button
-            onClick={handleClose}
-            disabled={isSubmitting}
-            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors disabled:opacity-50"
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
             aria-label="Close modal"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -84,87 +27,58 @@ export default function BugReportModal({ isOpen, onClose }: BugReportModalProps)
           </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Your Name (Optional)
-            </label>
-            <input
-              type="text"
-              id="name"
-              value={formData.name}
-              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-              placeholder="John Doe"
-            />
-          </div>
+        {/* Contact Information */}
+        <div className="space-y-6">
+          <div className="p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
+              Due to how I built the website, please directly contact me:
+            </p>
+            
+            <div className="space-y-3">
+              {/* Email */}
+              <div className="flex items-start gap-3">
+                <svg className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                <div>
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email:</p>
+                  <a 
+                    href="mailto:827070@bmtisd.com"
+                    className="text-blue-600 dark:text-blue-400 hover:underline font-medium break-all"
+                  >
+                    827070@bmtisd.com
+                  </a>
+                </div>
+              </div>
 
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Your Email (Optional)
-            </label>
-            <input
-              type="email"
-              id="email"
-              value={formData.email}
-              onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-              placeholder="john@example.com"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Bug Description <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              required
-              rows={5}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors resize-none"
-              placeholder="Describe the bug or issue you encountered..."
-            />
-          </div>
-
-          {/* Status Messages */}
-          {submitStatus === 'success' && (
-            <div className="p-3 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg">
-              <p className="text-sm text-green-800 dark:text-green-200 font-medium">
-                ✓ Bug report sent successfully! Thank you for your feedback.
-              </p>
+              {/* Instagram */}
+              <div className="flex items-start gap-3">
+                <svg className="w-5 h-5 text-pink-600 dark:text-pink-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                </svg>
+                <div>
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Instagram:</p>
+                  <a 
+                    href="https://instagram.com/c6.trev"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-pink-600 dark:text-pink-400 hover:underline font-medium"
+                  >
+                    @c6.trev
+                  </a>
+                </div>
+              </div>
             </div>
-          )}
-
-          {submitStatus === 'error' && (
-            <div className="p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg">
-              <p className="text-sm text-red-800 dark:text-red-200 font-medium">
-                ✗ {errorMessage}
-              </p>
-            </div>
-          )}
-
-          {/* Buttons */}
-          <div className="flex gap-3 pt-2">
-            <button
-              type="button"
-              onClick={handleClose}
-              disabled={isSubmitting}
-              className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting || !formData.description.trim()}
-              className="flex-1 px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSubmitting ? 'Sending...' : 'Send Report'}
-            </button>
           </div>
-        </form>
+
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="w-full px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-blue-600 transition-colors"
+          >
+            Got it!
+          </button>
+        </div>
       </div>
     </div>
   )
