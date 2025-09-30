@@ -4,13 +4,13 @@
 
 @layer base {
   body {
-    @apply bg-gradient-to-br from-blue-50 to-purple-50 min-h-screen;
+    @apply bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 min-h-screen transition-colors duration-300;
   }
 }
 
 @layer utilities {
   .cell-hover {
-    @apply hover:bg-gray-100 transition-colors duration-200;
+    @apply hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200;
   }
   
   .cell-x {

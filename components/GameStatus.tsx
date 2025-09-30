@@ -9,7 +9,7 @@ interface GameStatusProps {
 export default function GameStatus({ currentPlayer, winner, isDraw }: GameStatusProps) {
   if (winner) {
     return (
-      <div className="text-center p-6 bg-white rounded-xl shadow-lg">
+      <div className="text-center p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg transition-colors duration-300">
         <p className="text-2xl font-bold">
           <span className={winner === 'X' ? 'text-primary' : 'text-secondary'}>
             Player {winner}
@@ -22,15 +22,15 @@ export default function GameStatus({ currentPlayer, winner, isDraw }: GameStatus
 
   if (isDraw) {
     return (
-      <div className="text-center p-6 bg-white rounded-xl shadow-lg">
-        <p className="text-2xl font-bold text-gray-700">It's a draw! 🤝</p>
+      <div className="text-center p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg transition-colors duration-300">
+        <p className="text-2xl font-bold text-gray-700 dark:text-gray-300">It's a draw! 🤝</p>
       </div>
     )
   }
 
   return (
-    <div className="text-center p-6 bg-white rounded-xl shadow-lg">
-      <p className="text-xl font-semibold text-gray-700">
+    <div className="text-center p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg transition-colors duration-300">
+      <p className="text-xl font-semibold text-gray-700 dark:text-gray-300">
         Current Player:{' '}
         <span className={currentPlayer === 'X' ? 'text-primary' : 'text-secondary'}>
           {currentPlayer}
