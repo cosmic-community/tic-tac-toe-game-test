@@ -151,6 +151,11 @@ export default function Home() {
       return
     }
 
+    // Type guard to ensure currentPlayer is not null
+    if (!gameState.currentPlayer) {
+      return
+    }
+
     const newBoard = [...gameState.board]
     newBoard[index] = gameState.currentPlayer
 
