@@ -4,11 +4,18 @@ interface GameBoardProps {
   board: Board
   onCellClick: (index: number) => void
   disabled: boolean
+  boardSize: number
 }
 
-export default function GameBoard({ board, onCellClick, disabled }: GameBoardProps) {
+export default function GameBoard({ board, onCellClick, disabled, boardSize }: GameBoardProps) {
   return (
-    <div className="grid grid-cols-3 gap-3 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl transition-colors duration-300">
+    <div 
+      className="grid gap-3 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl transition-colors duration-300"
+      style={{
+        gridTemplateColumns: `repeat(${boardSize}, minmax(0, 1fr))`,
+        maxWidth: boardSize > 3 ? '600px' : '400px'
+      }}
+    >
       {board.map((cell, index) => (
         <button
           key={index}
@@ -16,7 +23,8 @@ export default function GameBoard({ board, onCellClick, disabled }: GameBoardPro
           disabled={disabled || cell !== null}
           className={`
             aspect-square w-full flex items-center justify-center
-            text-5xl font-bold rounded-xl border-2 border-gray-200 dark:border-gray-600
+            ${boardSize <= 3 ? 'text-5xl' : boardSize === 4 ? 'text-4xl' : 'text-3xl'}
+            font-bold rounded-xl border-2 border-gray-200 dark:border-gray-600
             transition-all duration-200
             ${!cell && !disabled ? 'cell-hover cursor-pointer' : ''}
             ${cell === 'X' ? 'cell-x bg-blue-50 dark:bg-blue-900/30' : ''}

@@ -1,19 +1,20 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import type { Player, Board, GameState, WinningCombination } from '@/types'
+import { useState, useEffect, useCallback } from 'react'
+import type { Player, Board, GameState, WinningCombination, GameSettings } from '@/types'
 import GameBoard from '@/components/GameBoard'
 import GameStatus from '@/components/GameStatus'
 import ScoreBoard from '@/components/ScoreBoard'
 import BugReportModal from '@/components/BugReportModal'
-
-const WINNING_COMBINATIONS: WinningCombination[] = [
-  [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
-  [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
-  [0, 4, 8], [2, 4, 6] // Diagonals
-]
+import SettingsModal from '@/components/SettingsModal'
 
 export default function Home() {
+  const [gameSettings, setGameSettings] = useState<GameSettings>({
+    boardSize: 3,
+    timerEnabled: false,
+    timerDuration: 30
+  })
+
   const [gameState, setGameState] = useState<GameState>({
     board: Array(9).fill(null),
     currentPlayer: 'X',
@@ -22,16 +23,35 @@ export default function Home() {
     scores: {
       X: 0,
       O: 0
-    }
+    },
+    boardSize: 3,
+    timeLeft: 30,
+    timerEnabled: false
   })
+  
   const [showBugReport, setShowBugReport] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
 
-  // Load scores from localStorage on mount
+  // Load scores and settings from localStorage on mount
   useEffect(() => {
     const savedScores = localStorage.getItem('tic-tac-toe-scores')
+    const savedSettings = localStorage.getItem('tic-tac-toe-settings')
+    
     if (savedScores) {
       const scores = JSON.parse(savedScores)
       setGameState(prev => ({ ...prev, scores }))
+    }
+    
+    if (savedSettings) {
+      const settings = JSON.parse(savedSettings)
+      setGameSettings(settings)
+      setGameState(prev => ({ 
+        ...prev, 
+        boardSize: settings.boardSize,
+        timerEnabled: settings.timerEnabled,
+        timeLeft: settings.timerDuration,
+        board: Array(settings.boardSize * settings.boardSize).fill(null)
+      }))
     }
   }, [])
 
@@ -40,17 +60,90 @@ export default function Home() {
     localStorage.setItem('tic-tac-toe-scores', JSON.stringify(gameState.scores))
   }, [gameState.scores])
 
-  const checkWinner = (board: Board): Player => {
-    for (const [a, b, c] of WINNING_COMBINATIONS) {
-      if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-        return board[a]
+  // Timer logic
+  useEffect(() => {
+    if (!gameState.timerEnabled || gameState.winner || gameState.isDraw) {
+      return
+    }
+
+    if (gameState.timeLeft <= 0) {
+      // Time's up - switch to other player
+      handleTimeUp()
+      return
+    }
+
+    const timer = setInterval(() => {
+      setGameState(prev => ({
+        ...prev,
+        timeLeft: prev.timeLeft - 1
+      }))
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [gameState.timeLeft, gameState.timerEnabled, gameState.winner, gameState.isDraw])
+
+  const handleTimeUp = () => {
+    setGameState(prev => ({
+      ...prev,
+      currentPlayer: prev.currentPlayer === 'X' ? 'O' : 'X',
+      timeLeft: gameSettings.timerDuration
+    }))
+  }
+
+  const generateWinningCombinations = useCallback((size: number): WinningCombination[] => {
+    const combinations: WinningCombination[] = []
+    
+    // Rows
+    for (let i = 0; i < size; i++) {
+      const row: number[] = []
+      for (let j = 0; j < size; j++) {
+        row.push(i * size + j)
+      }
+      combinations.push(row)
+    }
+    
+    // Columns
+    for (let i = 0; i < size; i++) {
+      const col: number[] = []
+      for (let j = 0; j < size; j++) {
+        col.push(j * size + i)
+      }
+      combinations.push(col)
+    }
+    
+    // Diagonal (top-left to bottom-right)
+    const diag1: number[] = []
+    for (let i = 0; i < size; i++) {
+      diag1.push(i * size + i)
+    }
+    combinations.push(diag1)
+    
+    // Diagonal (top-right to bottom-left)
+    const diag2: number[] = []
+    for (let i = 0; i < size; i++) {
+      diag2.push(i * size + (size - 1 - i))
+    }
+    combinations.push(diag2)
+    
+    return combinations
+  }, [])
+
+  const checkWinner = useCallback((board: Board, size: number): Player => {
+    const combinations = generateWinningCombinations(size)
+    
+    for (const combination of combinations) {
+      const firstCell = board[combination[0]]
+      if (!firstCell) continue
+      
+      if (combination.every(index => board[index] === firstCell)) {
+        return firstCell
       }
     }
     return null
-  }
+  }, [generateWinningCombinations])
 
   const checkDraw = (board: Board): boolean => {
-    return board.every(cell => cell !== null) && !checkWinner(board)
+    return board.every(cell => cell !== null) && !checkWinner(board, gameState.boardSize)
   }
 
   const handleCellClick = (index: number) => {
@@ -61,7 +154,7 @@ export default function Home() {
     const newBoard = [...gameState.board]
     newBoard[index] = gameState.currentPlayer
 
-    const winner = checkWinner(newBoard)
+    const winner = checkWinner(newBoard, gameState.boardSize)
     const isDraw = checkDraw(newBoard)
 
     let newScores = { ...gameState.scores }
@@ -73,21 +166,24 @@ export default function Home() {
     }
 
     setGameState({
+      ...gameState,
       board: newBoard,
       currentPlayer: gameState.currentPlayer === 'X' ? 'O' : 'X',
       winner,
       isDraw,
-      scores: newScores
+      scores: newScores,
+      timeLeft: gameSettings.timerDuration
     })
   }
 
   const resetGame = () => {
     setGameState(prev => ({
-      board: Array(9).fill(null),
+      ...prev,
+      board: Array(prev.boardSize * prev.boardSize).fill(null),
       currentPlayer: 'X',
       winner: null,
       isDraw: false,
-      scores: prev.scores
+      timeLeft: gameSettings.timerDuration
     }))
   }
 
@@ -100,9 +196,26 @@ export default function Home() {
     }))
   }
 
+  const handleSaveSettings = (settings: GameSettings) => {
+    setGameSettings(settings)
+    localStorage.setItem('tic-tac-toe-settings', JSON.stringify(settings))
+    
+    // Reset game with new settings
+    setGameState(prev => ({
+      ...prev,
+      board: Array(settings.boardSize * settings.boardSize).fill(null),
+      currentPlayer: 'X',
+      winner: null,
+      isDraw: false,
+      boardSize: settings.boardSize,
+      timerEnabled: settings.timerEnabled,
+      timeLeft: settings.timerDuration
+    }))
+  }
+
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-4">
-      <div className="max-w-md w-full space-y-8">
+      <div className="max-w-2xl w-full space-y-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">Tic-Tac-Toe</h1>
           <p className="text-gray-600 dark:text-gray-400">Challenge yourself or a friend!</p>
@@ -114,20 +227,36 @@ export default function Home() {
           currentPlayer={gameState.currentPlayer}
           winner={gameState.winner}
           isDraw={gameState.isDraw}
+          timeLeft={gameState.timeLeft}
+          timerEnabled={gameState.timerEnabled}
         />
 
         <GameBoard
           board={gameState.board}
           onCellClick={handleCellClick}
           disabled={!!gameState.winner || gameState.isDraw}
+          boardSize={gameState.boardSize}
         />
 
-        <button
-          onClick={resetGame}
-          className="w-full bg-primary text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-600 transition-colors duration-200 shadow-lg"
-        >
-          Reset Game
-        </button>
+        <div className="flex gap-3">
+          <button
+            onClick={resetGame}
+            className="flex-1 bg-primary text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-600 transition-colors duration-200 shadow-lg"
+          >
+            Reset Game
+          </button>
+          
+          <button
+            onClick={() => setShowSettings(true)}
+            className="flex-1 bg-purple-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-purple-700 transition-colors duration-200 shadow-lg flex items-center justify-center gap-2"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            Settings
+          </button>
+        </div>
 
         {/* Bug Report Button */}
         <button
@@ -161,6 +290,14 @@ export default function Home() {
       <BugReportModal 
         isOpen={showBugReport} 
         onClose={() => setShowBugReport(false)} 
+      />
+
+      {/* Settings Modal */}
+      <SettingsModal
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
+        currentSettings={gameSettings}
+        onSave={handleSaveSettings}
       />
     </main>
   )

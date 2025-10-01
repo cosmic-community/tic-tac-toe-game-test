@@ -11,6 +11,15 @@ export interface GameState {
     X: number;
     O: number;
   };
+  boardSize: number;
+  timeLeft: number;
+  timerEnabled: boolean;
 }
 
-export type WinningCombination = [number, number, number];
+export type WinningCombination = number[];
+
+export interface GameSettings {
+  boardSize: number;
+  timerEnabled: boolean;
+  timerDuration: number;
+}
