@@ -132,10 +132,14 @@ export default function Home() {
     const combinations = generateWinningCombinations(size)
     
     for (const combination of combinations) {
-      const firstCell = board[combination[0]]
+      // Type guard to ensure first index exists
+      const firstIndex = combination[0]
+      if (firstIndex === undefined) continue
+      
+      const firstCell = board[firstIndex]
       if (!firstCell) continue
       
-      if (combination.every(index => board[index] === firstCell)) {
+      if (combination.every(index => index !== undefined && board[index] === firstCell)) {
         return firstCell
       }
     }
