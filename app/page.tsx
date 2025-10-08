@@ -274,6 +274,54 @@ export default function Home() {
           }
         }))
         break
+      case 'swap-players':
+        setGameState(prev => ({
+          ...prev,
+          currentPlayer: prev.currentPlayer === 'X' ? 'O' : 'X',
+          timeLeft: gameSettings.timerDuration
+        }))
+        break
+      case 'fill-random':
+        setGameState(prev => {
+          const newBoard = [...prev.board]
+          const emptyCells = newBoard
+            .map((cell, index) => cell === null ? index : -1)
+            .filter(index => index !== -1)
+          
+          // Fill 3-5 random empty cells
+          const cellsToFill = Math.min(
+            Math.floor(Math.random() * 3) + 3,
+            emptyCells.length
+          )
+          
+          for (let i = 0; i < cellsToFill; i++) {
+            const randomIndex = Math.floor(Math.random() * emptyCells.length)
+            const cellIndex = emptyCells[randomIndex]
+            if (cellIndex !== undefined) {
+              newBoard[cellIndex] = Math.random() > 0.5 ? 'X' : 'O'
+              emptyCells.splice(randomIndex, 1)
+            }
+          }
+          
+          return {
+            ...prev,
+            board: newBoard
+          }
+        })
+        break
+      case 'reset-timer':
+        setGameState(prev => ({
+          ...prev,
+          timeLeft: gameSettings.timerDuration
+        }))
+        break
+      case 'instant-draw':
+        setGameState(prev => ({
+          ...prev,
+          isDraw: true,
+          winner: null
+        }))
+        break
     }
   }
 
