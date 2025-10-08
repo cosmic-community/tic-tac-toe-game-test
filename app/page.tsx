@@ -288,8 +288,18 @@ export default function Home() {
             </svg>
             <span className="text-sm font-medium">@c6.trev</span>
           </a>
+          </div>
+
+          {/* Kelvin Button */}
+          <div className="flex justify-center pt-2">
+            <button
+              onClick={() => alert('😂')}
+              className="px-6 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold rounded-lg shadow-lg hover:from-pink-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105"
+            >
+              kelvin is a bitch
+            </button>
+          </div>
         </div>
-      </div>
 
       {/* Bug Report Modal */}
       <BugReportModal 
