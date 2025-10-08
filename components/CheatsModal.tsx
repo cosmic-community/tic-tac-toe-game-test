@@ -122,7 +122,6 @@ export default function CheatsModal({ isOpen, onClose, onCheatActivated }: Cheat
               <button
                 onClick={() => handleCheatClick('win-x')}
                 className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold flex items-center justify-center gap-2"
-                className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold flex items-center justify-center gap-2"
               >
                 <span className="text-xl">X</span>
                 Force Win as X
