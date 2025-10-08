@@ -21,7 +21,7 @@ export default function CheatsModal({ isOpen, onClose, onCheatActivated }: Cheat
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (password.toUpperCase() === CORRECT_PASSWORD) {
+      if (password === CORRECT_PASSWORD) {
       setIsUnlocked(true)
       setError('')
     } else {
