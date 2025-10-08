@@ -13,8 +13,8 @@ export default function CheatsModal({ isOpen, onClose, onCheatActivated }: Cheat
   const [isUnlocked, setIsUnlocked] = useState(false)
   const [error, setError] = useState('')
 
-  // Password is "TICTAC" (you can change this)
-  const CORRECT_PASSWORD = 'TICTAC'
+  // Password is the one you specified
+  const CORRECT_PASSWORD = 'fuckoffnigga'
 
   if (!isOpen) return null
 

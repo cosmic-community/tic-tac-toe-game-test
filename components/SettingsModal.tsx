@@ -85,7 +85,7 @@ export default function SettingsModal({ isOpen, onClose, currentSettings, onSave
                   className="sr-only"
                 />
                 <div 
-                  className={`block w-14 h-8 rounded-full transition-colors ${
+                  className={`block w-14 h-8 rounded-full transition-colors cursor-pointer ${
                     timerEnabled ? 'bg-primary' : 'bg-gray-300 dark:bg-gray-600'
                   }`}
                   onClick={() => setTimerEnabled(!timerEnabled)}
