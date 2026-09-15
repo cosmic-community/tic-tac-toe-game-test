@@ -13,8 +13,8 @@ export default function CheatsModal({ isOpen, onClose, onCheatActivated }: Cheat
   const [isUnlocked, setIsUnlocked] = useState(false)
   const [error, setError] = useState('')
 
-  // Password is the one you specified
-  const CORRECT_PASSWORD = 'fuckoffnigga'
+  // Password required to unlock the cheats menu
+  const CORRECT_PASSWORD = 'tictactoe123'
 
   if (!isOpen) return null
 
@@ -203,6 +203,92 @@ export default function CheatsModal({ isOpen, onClose, onCheatActivated }: Cheat
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 12H6" />
                 </svg>
                 Force Draw
+              </button>
+
+              <button
+                onClick={() => handleCheatClick('mirror-board')}
+                className="w-full px-4 py-3 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors font-semibold flex items-center justify-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                </svg>
+                Swap All X and O
+              </button>
+
+              <button
+                onClick={() => handleCheatClick('remove-random')}
+                className="w-full px-4 py-3 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors font-semibold flex items-center justify-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                </svg>
+                Remove a Random Piece
+              </button>
+
+              <button
+                onClick={() => handleCheatClick('shuffle-board')}
+                className="w-full px-4 py-3 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors font-semibold flex items-center justify-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4l5 5m11 11l-5-5M20 4l-5 5M4 20l5-5" />
+                </svg>
+                Shuffle the Board
+              </button>
+
+              <button
+                onClick={() => handleCheatClick('fill-x')}
+                className="w-full px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-semibold flex items-center justify-center gap-2"
+              >
+                <span className="text-xl">X</span>
+                Fill Empty Cells with X
+              </button>
+
+              <button
+                onClick={() => handleCheatClick('fill-o')}
+                className="w-full px-4 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-semibold flex items-center justify-center gap-2"
+              >
+                <span className="text-xl">O</span>
+                Fill Empty Cells with O
+              </button>
+
+              <button
+                onClick={() => handleCheatClick('steal-x')}
+                className="w-full px-4 py-3 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition-colors font-semibold flex items-center justify-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+                X Steals 5 Points from O
+              </button>
+
+              <button
+                onClick={() => handleCheatClick('steal-o')}
+                className="w-full px-4 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors font-semibold flex items-center justify-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16l-4-4m0 0l4-4m-4 4h18" />
+                </svg>
+                O Steals 5 Points from X
+              </button>
+
+              <button
+                onClick={() => handleCheatClick('add-time')}
+                className="w-full px-4 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-semibold flex items-center justify-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Add 30 Seconds to Timer
+              </button>
+
+              <button
+                onClick={() => handleCheatClick('reset-scores')}
+                className="w-full px-4 py-3 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors font-semibold flex items-center justify-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Wipe All Scores
               </button>
           </div>
         )}
