@@ -281,6 +281,107 @@ export default function Home() {
           timeLeft: gameSettings.timerDuration
         }))
         break
+      case 'mirror-board':
+        setGameState(prev => {
+          const swapped: Board = prev.board.map(cell =>
+            cell === 'X' ? 'O' : cell === 'O' ? 'X' : null
+          )
+          const winner = checkWinner(swapped, prev.boardSize)
+          return {
+            ...prev,
+            board: swapped,
+            winner,
+            isDraw: false
+          }
+        })
+        break
+      case 'remove-random':
+        setGameState(prev => {
+          const newBoard = [...prev.board]
+          const filled = newBoard
+            .map((cell, index) => (cell !== null ? index : -1))
+            .filter(index => index !== -1)
+
+          if (filled.length === 0) return prev
+
+          const pick = filled[Math.floor(Math.random() * filled.length)]
+          if (pick === undefined) return prev
+
+          newBoard[pick] = null
+          return {
+            ...prev,
+            board: newBoard,
+            winner: checkWinner(newBoard, prev.boardSize),
+            isDraw: false
+          }
+        })
+        break
+      case 'shuffle-board':
+        setGameState(prev => {
+          const newBoard = [...prev.board]
+          for (let i = newBoard.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1))
+            const a = newBoard[i]
+            const b = newBoard[j]
+            if (a === undefined || b === undefined) continue
+            newBoard[i] = b
+            newBoard[j] = a
+          }
+          return {
+            ...prev,
+            board: newBoard,
+            winner: checkWinner(newBoard, prev.boardSize),
+            isDraw: false
+          }
+        })
+        break
+      case 'fill-x':
+      case 'fill-o': {
+        const mark: Player = cheatType === 'fill-x' ? 'X' : 'O'
+        setGameState(prev => {
+          const newBoard: Board = prev.board.map(cell => (cell === null ? mark : cell))
+          return {
+            ...prev,
+            board: newBoard,
+            winner: checkWinner(newBoard, prev.boardSize),
+            isDraw: false
+          }
+        })
+        break
+      }
+      case 'steal-x':
+        setGameState(prev => ({
+          ...prev,
+          scores: {
+            X: prev.scores.X + 5,
+            O: Math.max(0, prev.scores.O - 5)
+          }
+        }))
+        break
+      case 'steal-o':
+        setGameState(prev => ({
+          ...prev,
+          scores: {
+            X: Math.max(0, prev.scores.X - 5),
+            O: prev.scores.O + 5
+          }
+        }))
+        break
+      case 'add-time':
+        setGameState(prev => ({
+          ...prev,
+          timeLeft: prev.timeLeft + 30
+        }))
+        break
+      case 'reset-scores': {
+        const clearedScores = { X: 0, O: 0 }
+        localStorage.setItem('tic-tac-toe-scores', JSON.stringify(clearedScores))
+        setGameState(prev => ({
+          ...prev,
+          scores: clearedScores
+        }))
+        break
+      }
       case 'fill-random':
         setGameState(prev => {
           const newBoard = [...prev.board]
